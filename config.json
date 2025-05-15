@@ -1,0 +1,68 @@
+{
+  "preprocessing": {
+    "target_size": [512, 512],
+    "resize_strategy": "pad_to_square",
+    "normalization": {
+      "type": "minmax",
+      "range": [0, 255]
+    }
+  },
+  "pipeline": [
+    {
+      "name": "clahe_correction",
+      "type": "classical",
+      "method": "clahe",
+      "params": {
+        "clip_limit": 1.5,
+        "grid_size": [8, 8]
+      }
+    },
+    {
+      "name": "bilateral_filter",
+      "type": "classical",
+      "method": "bilateral_filter",
+      "params": {
+          "d": 5,
+          "sigma_color": 50, 
+          "sigma_space": 50
+      }
+    },
+    {
+      "name": "denoising_autoencoder",
+      "type": "neural",
+      "model": "denoiser",
+      "params": {
+        "strength": 0.7,
+        "input_size": [224, 224],
+        "output_resize": "original"
+      }
+    },
+    {
+      "name": "unet_enhancement",
+      "type": "neural",
+      "model": "unet",
+      "params": {
+        "resize_mode": "pad",
+        "padding_mode": "reflect",
+        "output_resize": "original"
+      }
+    },
+    {
+      "name": "sharpening",
+      "type": "classical",
+      "method": "sharpen",
+      "params": {
+          "strength": 0.7,
+          "kernel_size": 3
+      }
+  }
+  ],
+  "postprocessing": {
+    "denormalize": true,
+    "convert_to": "uint8",
+    "save_options": {
+      "quality": 95,
+      "format": "png" 
+    }
+  }
+}
